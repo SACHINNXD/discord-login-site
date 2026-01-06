@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <style>
+    body { margin:0; background:#fff; font-family:Arial }
+    #top { position:fixed; top:20px; right:20px }
+    button { padding:10px 16px; cursor:pointer }
+  </style>
+</head>
+<body>
+
+<div id="top">
+  <button onclick="login()">Login</button>
+</div>
+
+<script>
+function login() {
+  window.location.href = "/.netlify/functions/login";
+}
+
+async function checkLogin() {
+  const res = await fetch("/.netlify/functions/me", {
+    credentials: "include"
+  });
+
+  if (res.ok) {
+    const user = await res.json();
+    document.getElementById("top").innerHTML =
+      `<strong>${user.username}</strong>`;
+  }
+}
+
+checkLogin();
+</script>
+
+</body>
+</html>
+i
