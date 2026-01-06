@@ -45,34 +45,29 @@
 </head>
 <body>
 
-  <!-- Top right area -->
   <div class="top-right" id="topRight"></div>
-
-  <!-- Center content -->
   <div class="center" id="centerContent"></div>
 
   <script>
-    function getUserFromCookie() {
-      const match = document.cookie.match(/user=([^;]+)/);
-      if (!match) return null;
-      try {
-        return JSON.parse(atob(match[1]));
-      } catch {
-        return null;
+    async function loadUser() {
+      const res = await fetch("/.netlify/functions/me", {
+        credentials: "include"
+      });
+
+      const topRight = document.getElementById("topRight");
+      const center = document.getElementById("centerContent");
+
+      if (!res.ok) {
+        // NOT LOGGED IN
+        topRight.innerHTML = `
+          <a class="btn" href="/.netlify/functions/login">Login</a>
+        `;
+        return;
       }
-    }
 
-    const user = getUserFromCookie();
-    const topRight = document.getElementById("topRight");
-    const center = document.getElementById("centerContent");
-
-    if (!user) {
-      // NOT LOGGED IN
-      topRight.innerHTML = `
-        <a class="btn" href="/.netlify/functions/login">Login</a>
-      `;
-    } else {
       // LOGGED IN
+      const user = await res.json();
+
       topRight.innerHTML = `
         <span class="username">${user.username}</span>
       `;
@@ -87,6 +82,8 @@
         </a>
       `;
     }
+
+    loadUser();
   </script>
 
 </body>
