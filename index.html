@@ -1,39 +1,93 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Login</title>
+  <meta charset="UTF-8" />
+  <title>Security Max</title>
   <style>
-    body { margin:0; background:#fff; font-family:Arial }
-    #top { position:fixed; top:20px; right:20px }
-    button { padding:10px 16px; cursor:pointer }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: white;
+    }
+
+    .top-right {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      background: #5865F2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: #4752c4;
+    }
+
+    .center {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .username {
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
-<div id="top">
-  <button onclick="login()">Login</button>
-</div>
+  <!-- Top right area -->
+  <div class="top-right" id="topRight"></div>
 
-<script>
-function login() {
-  window.location.href = "/.netlify/functions/login";
-}
+  <!-- Center content -->
+  <div class="center" id="centerContent"></div>
 
-async function checkLogin() {
-  const res = await fetch("/.netlify/functions/me", {
-    credentials: "include"
-  });
+  <script>
+    function getUserFromCookie() {
+      const match = document.cookie.match(/user=([^;]+)/);
+      if (!match) return null;
+      try {
+        return JSON.parse(atob(match[1]));
+      } catch {
+        return null;
+      }
+    }
 
-  if (res.ok) {
-    const user = await res.json();
-    document.getElementById("top").innerHTML =
-      `<strong>${user.username}</strong>`;
-  }
-}
+    const user = getUserFromCookie();
+    const topRight = document.getElementById("topRight");
+    const center = document.getElementById("centerContent");
 
-checkLogin();
-</script>
+    if (!user) {
+      // NOT LOGGED IN
+      topRight.innerHTML = `
+        <a class="btn" href="/.netlify/functions/login">Login</a>
+      `;
+    } else {
+      // LOGGED IN
+      topRight.innerHTML = `
+        <span class="username">${user.username}</span>
+      `;
+
+      center.innerHTML = `
+        <a
+          class="btn"
+          href="https://discord.com/oauth2/authorize?client_id=1457942798644019349&permissions=8&integration_type=0&scope=bot"
+          target="_blank"
+        >
+          Invite Security Max to your server
+        </a>
+      `;
+    }
+  </script>
 
 </body>
 </html>
-i
