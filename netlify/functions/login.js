@@ -3,13 +3,13 @@ exports.handler = async () => {
     client_id: process.env.DISCORD_CLIENT_ID,
     redirect_uri: `${process.env.SITE_URL}/.netlify/functions/callback`,
     response_type: "code",
-    scope: "identify"
+    scope: "identify guilds"
   });
 
   return {
     statusCode: 302,
     headers: {
-      Location: `https://discord.com/api/oauth2/authorize?${params}`
+      Location: `https://discord.com/api/oauth2/authorize?${params.toString()}`
     }
   };
 };
