@@ -1,90 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
   <title>Security Max</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: white;
-    }
-
-    .top-right {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-    }
-
+    body { font-family: Arial; margin: 0; }
+    .top { position: absolute; top: 20px; right: 20px; }
     .btn {
       padding: 12px 20px;
       background: #5865F2;
       color: white;
-      border: none;
       border-radius: 6px;
-      cursor: pointer;
-      font-size: 15px;
       text-decoration: none;
+      cursor: pointer;
     }
-
-    .btn:hover {
-      background: #4752c4;
-    }
-
     .center {
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      margin-top: 120px;
+      text-align: center;
     }
-
-    .username {
-      font-weight: bold;
+    .servers {
+      margin-top: 30px;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .server img {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
     }
   </style>
 </head>
 <body>
 
-  <div class="top-right" id="topRight"></div>
-  <div class="center" id="centerContent"></div>
+<div class="top" id="top"></div>
+<div class="center" id="content"></div>
 
-  <script>
-    async function loadUser() {
-      const res = await fetch("/.netlify/functions/me", {
-        credentials: "include"
-      });
+<script>
+async function init() {
+  const top = document.getElementById("top");
+  const content = document.getElementById("content");
 
-      const topRight = document.getElementById("topRight");
-      const center = document.getElementById("centerContent");
+  const me = await fetch("/.netlify/functions/me", {
+    credentials: "include"
+  });
 
-      if (!res.ok) {
-        // NOT LOGGED IN
-        topRight.innerHTML = `
-          <a class="btn" href="/.netlify/functions/login">Login</a>
-        `;
-        return;
-      }
+  if (!me.ok) {
+    top.innerHTML = `<a class="btn" href="/.netlify/functions/login">Login</a>`;
+    return;
+  }
 
-      // LOGGED IN
-      const user = await res.json();
+  const user = await me.json();
+  top.innerHTML = `<b>${user.username}</b>`;
 
-      topRight.innerHTML = `
-        <span class="username">${user.username}</span>
-      `;
+  const res = await fetch("/.netlify/functions/servers", {
+    credentials: "include"
+  });
 
-      center.innerHTML = `
-        <a
-          class="btn"
-          href="https://discord.com/oauth2/authorize?client_id=1457942798644019349&permissions=8&integration_type=0&scope=bot"
-          target="_blank"
-        >
-          Invite Security Max to your server
-        </a>
-      `;
-    }
+  const servers = await res.json();
 
-    loadUser();
-  </script>
+  if (!servers.length) {
+    content.innerHTML = `
+      <a class="btn"
+        href="https://discord.com/oauth2/authorize?client_id=1457942798644019349&permissions=8&integration_type=0&scope=bot"
+        target="_blank">
+        Invite Security Max to your server
+      </a>
+    `;
+    return;
+  }
+
+  content.innerHTML = `
+    <h2>Your Servers</h2>
+    <div class="servers">
+      ${servers.map(s => `
+        <div class="server">
+          ${s.icon ? `<img src="${s.icon}">` : ""}
+          <div>${s.name}</div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+init();
+</script>
 
 </body>
 </html>
